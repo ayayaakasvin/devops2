@@ -1,0 +1,7 @@
+- name: Wait for PostgreSQL to become healthy
+  docker_container_info:
+    name: postgres
+  register: pg_info
+  until: pg_info.container.State.Health.Status == "healthy"
+  retries: 10
+  delay: 5

@@ -1,0 +1,24 @@
+- name: Create docker network
+  docker_network:
+    name: keycloak_net
+
+- name: Run PostgreSQL container
+  docker_container:
+    name: postgres
+    image: postgres:16
+    restart_policy: always
+    networks:
+      - name: keycloak_net
+    env:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: strongpassword
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+- import_tasks: wait.yml
