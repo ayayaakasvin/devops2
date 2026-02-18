@@ -1,0 +1,7 @@
+kubectl get events --sort-by=.metadata.creationTimestamp # for events
+kubectl logs -f lab4-best-effort -c application
+kubectl label node minikube disktype=ssd
+kubectl taint nodes minikube special=true:NoSchedule
+kubectl taint nodes minikube special:NoSchedule-
+
+minikube start --driver=docker --nodes=1 --memory=2gb --cpus=2
