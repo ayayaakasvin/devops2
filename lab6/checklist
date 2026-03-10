@@ -1,0 +1,2 @@
+minikube ip to app1.local
+so we can access via domain and make sure that addon runs (ingress)
