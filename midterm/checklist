@@ -1,0 +1,6 @@
+minikube up by using --cni calico
+first we add configmap
+up networkpolicy
+up database -> service
+up migration tool
+up backend -> service

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  labels:
+    app: backend
+spec:
+  selector:
+    app: backend           # matches the labels on backend Pods
+  ports:
+    - protocol: TCP
+      port: 8080           # the port that the service exposes
+      targetPort: 8080     # the port on the Pod containers
+  type: ClusterIP          # default, internal only

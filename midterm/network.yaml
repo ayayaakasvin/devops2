@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: midterm-network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: midterm-app
+
+  policyTypes:
+  - Ingress
+  - Egress
+
+  ingress:
+  - ports:
+    - protocol: TCP
+      port: 8080
+
+  egress:
+    - to:
+      - podSelector:
+          matchLabels:
+            role: database            
+      ports:
+      - protocol: TCP
+        port: 5432

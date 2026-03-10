@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS records (
+    id SERIAL PRIMARY KEY,
+    payload TEXT NOT NULL
+);

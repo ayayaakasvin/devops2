@@ -1,0 +1,51 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-migration
+  labels:
+    app: migration
+
+spec:
+  backoffLimit: 3
+
+  template:
+    metadata:
+      labels:
+        app: migration
+
+    spec:
+      restartPolicy: Never
+
+      volumes:
+      - name: migrations
+        configMap:
+          name: migrations
+
+      containers:
+      - name: migration
+        image: migration-app:1.0
+        imagePullPolicy: Never
+
+        command: ["./built-binary", "up"]
+
+        args:
+        - -driver=postgres
+        - -host=postgres
+        - -dbname=basic
+        - -port=5432
+        - -user=postgres
+        - -password=postgres
+        - -path=/migrations/0001_up_database.up.sql
+
+        volumeMounts:
+        - name: migrations
+          mountPath: /migrations
+          readOnly: true
+
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
