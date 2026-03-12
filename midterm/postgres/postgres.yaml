@@ -3,11 +3,12 @@ kind: Pod
 metadata:
   name: postgres
   labels:
-    app: postgres
+    app: midterm-app
+    role: database
 spec:
   volumes:
     - name: pgdata
-      emptyDir: {}  # for demo; in prod, use a PersistentVolumeClaim
+      emptyDir: {}  
 
   initContainers:
   - name: fix-permissions
@@ -45,16 +46,34 @@ spec:
         readOnlyRootFilesystem: false
 
       readinessProbe:
-        tcpSocket:
-          port: 5432
-        initialDelaySeconds: 5
+        exec:
+          command:
+          - pg_isready
+          - -U
+          - postgres
+          - -h
+          - localhost
+          - -p
+          - "5432"
+        initialDelaySeconds: 15          # give initdb time
         periodSeconds: 10
-        timeoutSeconds: 2
-        
+        timeoutSeconds: 3
+        failureThreshold: 6
+
       livenessProbe:
-        tcpSocket:
-          port: 5432
-        initialDelaySeconds: 15
+        exec:
+          command:
+          - pg_isready
+          - -U
+          - postgres
+          - -h
+          - localhost
+          - -p
+          - "5432"
+        initialDelaySeconds: 60          # be more patient — Postgres can take time to recover
+        periodSeconds: 30
+        timeoutSeconds: 5
+        failureThreshold: 6     
 
       resources:
         requests:

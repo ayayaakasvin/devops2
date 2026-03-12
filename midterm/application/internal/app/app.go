@@ -83,6 +83,7 @@ func (s *ServerApp) setupServer() {
 	}
 
 	s.server.Addr = s.httpcfg.Address
+	s.logger.Infof("Server address set to: %s", s.server.Addr)
 	s.server.IdleTimeout = s.httpcfg.IdleTimeout
 	s.server.ReadTimeout = s.httpcfg.Timeout
 	s.server.WriteTimeout = s.httpcfg.Timeout

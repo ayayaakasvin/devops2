@@ -3,7 +3,8 @@ kind: Job
 metadata:
   name: db-migration
   labels:
-    app: migration
+    app: midterm-app
+    role: migration
 
 spec:
   backoffLimit: 3
@@ -11,7 +12,8 @@ spec:
   template:
     metadata:
       labels:
-        app: migration
+        app: midterm-app
+        role: migration
 
     spec:
       restartPolicy: Never
@@ -30,11 +32,7 @@ spec:
 
         args:
         - -driver=postgres
-        - -host=postgres
-        - -dbname=basic
-        - -port=5432
-        - -user=postgres
-        - -password=postgres
+        - -url=postgres://postgres:postgres@postgres-service:5432/basic?sslmode=disable&connect_timeout=5
         - -path=/migrations/0001_up_database.up.sql
 
         volumeMounts:

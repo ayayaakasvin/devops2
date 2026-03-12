@@ -1,4 +1,4 @@
-FROM golang:1.25.3 AS builder
+FROM golang:1.25.6 AS builder
 
 WORKDIR /app
 COPY . .
@@ -15,6 +15,6 @@ COPY --from=builder /app/built-binary .
 
 ENV CONFIG_PATH=/etc/config/config.yaml
 
-EXPOSE 8080
+EXPOSE 80
 
 CMD ["./built-binary"]

@@ -17,22 +17,22 @@ func main() {
 	cfg := config.MustLoadConfig()
 	log.Infof("Configs retrieved: %v", cfg)
 	log.Infof("%s", time.Now().String())
-	script := `
-	CREATE TABLE IF NOT EXISTS records (
-    id SERIAL PRIMARY KEY,
-    payload TEXT NOT NULL
-	);`
+	// script := `
+	// CREATE TABLE IF NOT EXISTS records (
+    // id SERIAL PRIMARY KEY,
+    // payload TEXT NOT NULL
+	// );`
 
 	repo, err := postgresql.NewPostgreSQLConnection(cfg.DatabaseConfig)
 	if err != nil {
 		log.Errorf("failed to set session id: %v", err)
 		os.Exit(1)
 	}
-	err = repo.RunMigration(script)
-	if err != nil {
-		log.Errorf("failed to run migration: %v", err)
-		os.Exit(1)
-	}
+	// err = repo.RunMigration(script)
+	// if err != nil {
+	// 	log.Errorf("failed to run migration: %v", err)
+	// 	os.Exit(1)
+	// }
 
 	srv := app.NewServerApp(&cfg.HTTPServer, log, repo)
 

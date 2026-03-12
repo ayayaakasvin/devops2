@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  labels:
+    app: midterm-app
+spec:
+  selector:
+    app: midterm-app
+    role: backend
+  ports:
+    - protocol: TCP
+      port: 80           # the port that the service exposes
+      targetPort: 80     # the port on the Pod containers
+  type: ClusterIP          # default, internal only

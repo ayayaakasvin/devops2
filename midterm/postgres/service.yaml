@@ -4,7 +4,8 @@ metadata:
   name: postgres-service
 spec:
   selector:
-    app: postgres
+    app: midterm-app
+    role: database
   ports:
   - port: 5432
     targetPort: 5432
