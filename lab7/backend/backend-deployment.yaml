@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: lab7
+  labels:
+    role: backend
+spec:
+  replicas: 3
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      role: backend
+
+  template:
+    metadata:
+      labels:
+        role: backend
+    spec:
+      volumes:
+      - name: app-config
+        configMap:
+          name: app-config
+      
+
+      securityContext:
+        fsGroup: 2000
+        seccompProfile:
+          type: RuntimeDefault
+
+      containers:
+      - name: backend
+        image: application:1.2
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+
+        volumeMounts:
+        - name: app-config
+          mountPath: /etc/config
+          readOnly: true
+
+        envFrom:
+        - secretRef:
+            name: lab7-env
+
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "1"
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
+          
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 3000
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 2
+          failureThreshold: 3
+          successThreshold: 1
+          
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 20
+          timeoutSeconds: 2
+          failureThreshold: 5
+          successThreshold: 1

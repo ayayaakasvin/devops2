@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-replica
+  namespace: lab7
+  labels:
+    app: redis
+    role: replica
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+      role: replica
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: replica
+    spec:
+      containers:
+      - name: redis
+        image: redis:7
+        ports:
+        - containerPort: 6379
+        command:
+          - redis-server
+          - "--appendonly"
+          - "yes"
+          - "--replicaof"
+          - "redis-master"
+          - "6379"
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+          requests:
+            memory: "128Mi"
+            cpu: "250m"

@@ -1,0 +1,4 @@
+http-server:
+  address: "0.0.0.0:80"
+  timeout: 15s
+  idle_timeout: 31s
