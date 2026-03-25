@@ -1,0 +1,220 @@
+> helm install my-release . --dry-run --debug
+level=WARN msg="--dry-run is deprecated and should be replaced with '--dry-run=client'"
+level=DEBUG msg="Original chart version" version=""
+level=DEBUG msg="Chart path" path=/mnt/data/code/kbtu/devops/lab8/lab8-chart
+level=DEBUG msg="number of dependencies in the chart" chart=lab8-chart dependencies=0
+NAME: my-release
+LAST DEPLOYED: Thu Mar 26 03:45:55 2026
+NAMESPACE: default
+STATUS: pending-install
+REVISION: 1
+DESCRIPTION: Dry run complete
+USER-SUPPLIED VALUES:
+{}
+
+COMPUTED VALUES:
+affinity: {}
+autoscaling:
+  enabled: false
+  maxReplicas: 100
+  minReplicas: 1
+  targetCPUUtilizationPercentage: 80
+fullnameOverride: ""
+httpRoute:
+  annotations: {}
+  enabled: false
+  hostnames:
+  - chart-example.local
+  parentRefs:
+  - name: gateway
+    sectionName: http
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /headers
+image:
+  pullPolicy: IfNotPresent
+  repository: nginx
+  tag: stable-alpine
+imagePullSecrets: []
+ingress:
+  annotations: {}
+  className: ""
+  enabled: false
+  hosts:
+  - host: chart-example.local
+    paths:
+    - path: /
+      pathType: ImplementationSpecific
+  tls: []
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+nameOverride: ""
+networkPolicy:
+  enabled: true
+nodeSelector: {}
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+replicaCount: 3
+resources: {}
+role:
+  enabled: true
+securityContext: {}
+service:
+  port: 80
+  type: ClusterIP
+serviceAccount:
+  annotations: {}
+  automount: true
+  create: true
+  name: ""
+tolerations: []
+volumeMounts: []
+volumes: []
+
+HOOKS:
+---
+# Source: lab8-chart/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "my-release-lab8-chart-test-connection"
+  labels:
+    helm.sh/chart: lab8-chart-0.1.0
+    app.kubernetes.io/name: lab8-chart
+    app.kubernetes.io/instance: my-release
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['my-release-lab8-chart:80']
+  restartPolicy: Never
+MANIFEST:
+---
+# Source: lab8-chart/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: my-release-lab8-chart-policy
+spec:
+  podSelector:
+    matchLabels:
+    app.kubernetes.io/name: lab8-chart
+    app.kubernetes.io/instance: my-release
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+          app.kubernetes.io/name: lab8-chart
+          app.kubernetes.io/instance: my-release
+---
+# Source: lab8-chart/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: my-release-lab8-chart
+  labels:
+    helm.sh/chart: lab8-chart-0.1.0
+    app.kubernetes.io/name: lab8-chart
+    app.kubernetes.io/instance: my-release
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+automountServiceAccountToken: true
+---
+# Source: lab8-chart/templates/roles.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: my-release-lab8-chart-role
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "watch", "list"]
+---
+# Source: lab8-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-release-lab8-chart
+  labels:
+    helm.sh/chart: lab8-chart-0.1.0
+    app.kubernetes.io/name: lab8-chart
+    app.kubernetes.io/instance: my-release
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: lab8-chart
+    app.kubernetes.io/instance: my-release
+---
+# Source: lab8-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-release-lab8-chart
+  labels:
+    helm.sh/chart: lab8-chart-0.1.0
+    app.kubernetes.io/name: lab8-chart
+    app.kubernetes.io/instance: my-release
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: lab8-chart
+      app.kubernetes.io/instance: my-release
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: lab8-chart-0.1.0
+        app.kubernetes.io/name: lab8-chart
+        app.kubernetes.io/instance: my-release
+        app.kubernetes.io/version: "1.16.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      serviceAccountName: my-release-lab8-chart
+      containers:
+        - name: lab8-chart
+          image: "nginx:stable-alpine"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+
+NOTES:
+1. Get the application URL by running these commands:
+  export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=lab8-chart,app.kubernetes.io/instance=my-release" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace default $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  echo "Visit http://127.0.0.1:8080 to use your application"
+  kubectl --namespace default port-forward $POD_NAME 8080:$CONTAINER_PORT
